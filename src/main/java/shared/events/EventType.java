@@ -1,0 +1,11 @@
+package shared.events;
+
+public enum EventType {
+    TEAM_CREATED,
+    TEAM_UPDATED,
+    TEAM_DELETED,
+    MATCH_SCHEDULED,
+    MATCH_COMPLETED,
+    MATCH_CANCELLED,
+    MATCH_RESULT_NOTIFICATION
+}

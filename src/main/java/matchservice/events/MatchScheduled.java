@@ -1,4 +1,21 @@
 package matchservice.events;
 
-public class MatchScheduled {
+import eventbus.Event;
+import matchservice.Match;
+
+public class MatchScheduled implements Event {
+    private final Match match;
+
+    public MatchScheduled(Match match) {
+        this.match = match;
+    }
+
+    public Match getMatch() {
+        return match;
+    }
+
+    @Override
+    public String getType() {
+        return "MatchScheduled";  // Type d'événement unique pour MatchScheduled
+    }
 }
