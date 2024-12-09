@@ -1,4 +1,6 @@
 package eventbus;
 
-public class Event {
+public interface Event {
+
+    String getType();
 }
