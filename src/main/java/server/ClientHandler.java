@@ -1,64 +1,102 @@
 package server;
 
 import eventbus.EventBus;
+import eventbus.Event;
 import teamservice.events.TeamCreated;
+import teamservice.events.TeamDeleted;
+import teamservice.events.TeamUpdated;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
+import java.util.Scanner;
+import java.io.PrintWriter;
 
 public class ClientHandler implements Runnable {
-    private final Socket clientSocket;
+    private final Socket socket;
     private final EventBus eventBus;
 
-    public ClientHandler(Socket clientSocket, EventBus eventBus) {
-        this.clientSocket = clientSocket;
+    public ClientHandler(Socket socket, EventBus eventBus) {
+        this.socket = socket;
         this.eventBus = eventBus;
-
-        // Listen to events on the EventBus
-        this.eventBus.subscribe("TeamCreated", event -> {
-            if (event instanceof TeamCreated teamCreated) { // Utilisation du pattern matching
-                sendMessage("TeamCreated: " + teamCreated.getId());
-            }
-        });
     }
 
     @Override
     public void run() {
-        try (
-                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)
-        ) {
-            String message;
-            while ((message = in.readLine()) != null) {
-                System.out.println("Received from client: " + message);
+        try (InputStream input = socket.getInputStream();
+             OutputStream output = socket.getOutputStream()) {
 
-                // Example: parse and publish events
-                if (message.startsWith("CreateTeam")) {
-                    String[] parts = message.split(";", 3);
-                    if (parts.length == 3) {
-                        String id = parts[1];
-                        String name = parts[2];
-                        eventBus.publish(new TeamCreated(id, name));
+            Scanner scanner = new Scanner(input);
+            PrintWriter writer = new PrintWriter(output, true);
+
+            writer.println("Welcome to the Tournament Server!");
+            String clientMessage;
+
+            while ((clientMessage = scanner.nextLine()) != null) {
+                System.out.println("Received from client: " + clientMessage);
+
+                // Gestion des événements
+                if (clientMessage.startsWith("event:")) {
+                    String eventPayload = clientMessage.substring(6); // Supprimer "event:"
+                    Event receivedEvent = parseEvent(eventPayload);
+
+                    if (receivedEvent != null) {
+                        // Publier l'événement localement
+                        eventBus.publish(receivedEvent);
+
+                        // Relayer l'événement à tous les clients
+                        relayEventToAllClients(eventPayload);
                     }
                 }
+
+                // Répondre au client
+                writer.println("Server received: " + clientMessage);
             }
-        } catch (IOException e) {
-            System.err.println("Client handler error: " + e.getMessage());
-        } finally {
-            try {
-                clientSocket.close();
-            } catch (IOException e) {
-                System.err.println("Error closing socket: " + e.getMessage());
+        } catch (IOException ex) {
+            System.out.println("Error handling client: " + ex.getMessage());
+        }
+    }
+
+    private void relayEventToAllClients(String eventPayload) {
+        // Envoyer l'événement à tous les clients connectés
+        synchronized (Server.clientHandlers) {
+            for (ClientHandler handler : Server.clientHandlers) {
+                if (handler != this) { // Éviter d'envoyer à l'émetteur
+                    handler.sendMessage("event:" + eventPayload);
+                }
             }
         }
     }
 
-    private void sendMessage(String message) {
+    public void sendMessage(String message) {
         try {
-            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-            out.println(message);
+            PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
+            writer.println(message);
         } catch (IOException e) {
-            System.err.println("Error sending message: " + e.getMessage());
+            System.out.println("Error sending message to client: " + e.getMessage());
         }
     }
+
+
+    private Event parseEvent(String payload) {
+        try {
+            String[] parts = payload.split(";");
+            switch (parts[0]) {
+                case "TeamCreated":
+                    return new TeamCreated(parts[1], parts[2]); // ID, Name
+                case "TeamUpdated":
+                    return new TeamUpdated(parts[1], parts[2]); // ID, NewName
+                case "TeamDeleted":
+                    return new TeamDeleted(parts[1]); // ID
+                default:
+                    throw new IllegalArgumentException("Unknown event type: " + parts[0]);
+            }
+        } catch (Exception e) {
+            System.out.println("Error parsing event: " + e.getMessage());
+            return null;
+        }
+    }
+
+
 }

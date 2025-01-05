@@ -6,49 +6,95 @@ import teamservice.TeamController;
 import matchservice.MatchController;
 import notificationservice.NotificationController;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.Scanner;
 
 public class Main {
+    private static Socket socket;
+    private static PrintWriter writer;
+    private static Scanner serverScanner;
+
     public static void main(String[] args) {
-        // Initialisation du bus d'événements
-        EventBus eventBus = new EventBus();
+        // Initialisation de la connexion au serveur
+        String serverHost = "127.0.0.1"; // Adresse IP du serveur
+        int serverPort = 12345; // Port du serveur
 
-        // Instanciation des différents contrôleurs
-        TeamController teamController = new TeamController(eventBus);
-        MatchController matchController = new MatchController(eventBus);
-        NotificationController notificationController = new NotificationController(new NotificationService(eventBus));
+        try {
+            socket = new Socket(serverHost, serverPort);
+            writer = new PrintWriter(socket.getOutputStream(), true);
+            serverScanner = new Scanner(socket.getInputStream());
+            System.out.println("Connected to the server");
 
-        // Scanner pour les interactions utilisateur
-        Scanner scanner = new Scanner(System.in);
+            // Envoi d'un message au serveur
+            writer.println("Hello Server! Main Client Connected.");
 
-        while (true) {
-            System.out.println("\n=== Main Menu ===");
-            System.out.println("1. Team Management");
-            System.out.println("2. Match Management");
-            System.out.println("3. Notification Management");
-            System.out.println("4. Exit");
-            System.out.print("Choice: ");
+            // Initialisation du bus d'événements
+            EventBus eventBus = new EventBus();
 
-            int choice = Integer.parseInt(scanner.nextLine());
-            switch (choice) {
-                case 1 -> {
-                    System.out.println("Launching Team Management...");
-                    teamController.start(); // Lance le menu du TeamController
+            // Instanciation des différents contrôleurs
+            TeamController teamController = new TeamController(eventBus);
+            MatchController matchController = new MatchController(eventBus);
+            NotificationController notificationController = new NotificationController(new NotificationService(eventBus));
+
+            // Scanner pour les interactions utilisateur
+            Scanner scanner = new Scanner(System.in);
+
+            while (true) {
+                System.out.println("\n=== Main Menu ===");
+                System.out.println("1. Team Management");
+                System.out.println("2. Match Management");
+                System.out.println("3. Notification Management");
+                System.out.println("4. Send Message to Server");
+                System.out.println("5. Exit");
+                System.out.print("Choice: ");
+
+                int choice = Integer.parseInt(scanner.nextLine());
+                switch (choice) {
+                    case 1 -> {
+                        System.out.println("Launching Team Management...");
+                        teamController.start(); // Lance le menu du TeamController
+                    }
+                    case 2 -> {
+                        System.out.println("Launching Match Management...");
+                        matchController.start();
+                    }
+                    case 3 -> {
+                        System.out.println("Launching Notification Management...");
+                        notificationController.start();
+                    }
+                    case 4 -> {
+                        System.out.print("Enter message to send to server: ");
+                        String message = scanner.nextLine();
+                        writer.println(message); // Envoi du message au serveur
+
+                        // Lecture de la réponse du serveur
+                        if (serverScanner.hasNextLine()) {
+                            System.out.println("Server: " + serverScanner.nextLine());
+                        }
+                    }
+                    case 5 -> {
+                        System.out.println("Exiting the application. Goodbye!");
+                        closeConnection();
+                        return; // Quitte l'application
+                    }
+                    default -> System.out.println("Invalid choice. Please try again.");
                 }
-                case 2 -> {
-                    System.out.println("Launching Match Management...");
-                    matchController.start();
-                }
-                case 3 -> {
-                    System.out.println("Launching Notification Management...");
-                    notificationController.start();
-                }
-                case 4 -> {
-                    System.out.println("Exiting the application. Goodbye!");
-                    return; // Quitte l'application
-                }
-                default -> System.out.println("Invalid choice. Please try again.");
             }
+        } catch (IOException ex) {
+            System.out.println("Error connecting to the server: " + ex.getMessage());
+        }
+    }
+
+    private static void closeConnection() {
+        try {
+            if (writer != null) writer.close();
+            if (serverScanner != null) serverScanner.close();
+            if (socket != null) socket.close();
+            System.out.println("Connection to the server closed.");
+        } catch (IOException ex) {
+            System.out.println("Error closing connection: " + ex.getMessage());
         }
     }
 }

@@ -1,12 +1,12 @@
 package eventbus;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class EventBus {
-    private final Map<String, Set<EventListener<? extends Event>>> listeners = new HashMap<>();
+    private final Map<String, Set<EventListener<? extends Event>>> listeners = new ConcurrentHashMap<>();
 
     public <T extends Event> void publish(T event) {
         Set<EventListener<? extends Event>> eventListeners = listeners.get(event.getType());

@@ -20,7 +20,7 @@ public class TeamService {
 
     public boolean addTeam(String id, String name) {
         if (teams.containsKey(id)) {
-            return false; // ID already exists
+            return false;
         }
 
         Team team = new Team(id, name);
