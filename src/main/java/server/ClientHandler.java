@@ -38,7 +38,7 @@ public class ClientHandler implements Runnable {
 
                 // Gestion des événements
                 if (clientMessage.startsWith("event:")) {
-                    String eventPayload = clientMessage.substring(6); // Supprimer "event:"
+                    String eventPayload = clientMessage.substring(6);
                     Event receivedEvent = parseEvent(eventPayload);
 
                     if (receivedEvent != null) {
@@ -50,7 +50,6 @@ public class ClientHandler implements Runnable {
                     }
                 }
 
-                // Répondre au client
                 writer.println("Server received: " + clientMessage);
             }
         } catch (IOException ex) {

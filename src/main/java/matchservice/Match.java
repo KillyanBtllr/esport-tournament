@@ -11,13 +11,12 @@ public class Match {
     private boolean isCompleted;
     private boolean isCancelled;
 
-    // Constructeur avec 3 arguments
     public Match(int matchId, String team1, String team2) {
         this.matchId = matchId;
         this.team1 = team1;
         this.team2 = team2;
-        this.scoreTeam1 = 0;  // Score initial de 0
-        this.scoreTeam2 = 0;  // Score initial de 0
+        this.scoreTeam1 = 0;
+        this.scoreTeam2 = 0;
         this.isCompleted = false;
         this.isCancelled = false;
     }
@@ -32,14 +31,6 @@ public class Match {
 
     public String getTeam2() {
         return team2;
-    }
-
-    public int getScoreTeam1() {
-        return scoreTeam1;
-    }
-
-    public int getScoreTeam2() {
-        return scoreTeam2;
     }
 
     public boolean isCompleted() {
@@ -61,24 +52,9 @@ public class Match {
         }
     }
 
-    // Nouvelle méthode pour mettre à jour les scores du match
-    public void setScore(int scoreTeam1, int scoreTeam2) {
-        if (isCancelled) {
-            System.out.println("Cannot set scores for a cancelled match.");
-        } else if (isCompleted) {
-            System.out.println("Match is already completed, scores cannot be changed.");
-        } else {
-            this.scoreTeam1 = scoreTeam1;
-            this.scoreTeam2 = scoreTeam2;
-            System.out.println("Scores updated: " + team1 + " " + scoreTeam1 + " - " + scoreTeam2 + " " + team2);
-        }
-    }
-
-    // Méthode pour annuler un match
-    public void cancelMatch() {
+    public void cancelMatch(int matchId) {
         if (!isCompleted) {
             this.isCancelled = true;
-            System.out.println("Match " + matchId + " has been cancelled.");
         } else {
             System.out.println("Cannot cancel a completed match.");
         }

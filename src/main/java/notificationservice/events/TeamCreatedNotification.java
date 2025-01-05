@@ -15,7 +15,7 @@ public class TeamCreatedNotification implements Event {
 
     @Override
     public String getType() {
-        return "TeamCreatedNotification"; // Retourne un type spécifique pour l'événement
+        return "TeamCreatedNotification";
     }
 
     @Override

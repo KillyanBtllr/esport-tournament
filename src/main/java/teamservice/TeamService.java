@@ -32,7 +32,7 @@ public class TeamService {
     public boolean updateTeam(String id, String newName) {
         Team team = teams.get(id);
         if (team == null) {
-            return false; // Team not found
+            return false;
         }
 
         team.setName(newName);
@@ -46,7 +46,7 @@ public class TeamService {
             eventBus.publish(new TeamDeleted(id));
             return true;
         }
-        return false; // Team not found
+        return false;
     }
 
     public Map<String, Team> getAllTeams() {

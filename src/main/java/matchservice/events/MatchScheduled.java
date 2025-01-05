@@ -16,6 +16,6 @@ public class MatchScheduled implements Event {
 
     @Override
     public String getType() {
-        return "MatchScheduled";  // Type d'événement unique pour MatchScheduled
+        return "MatchScheduled";
     }
 }

@@ -15,6 +15,6 @@ public class MatchResultNotification implements Event {
 
     @Override
     public String getType() {
-        return "MatchResultNotification";  // Nom unique pour cet événement
+        return "MatchResultNotification";
     }
 }

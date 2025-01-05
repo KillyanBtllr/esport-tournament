@@ -16,7 +16,7 @@ public class MatchCancelled implements Event {
 
     @Override
     public String getType() {
-        return "MatchCancelled";  // Retourne un type d'événement unique pour cet événement
+        return "MatchCancelled";
     }
 
     @Override

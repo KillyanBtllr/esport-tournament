@@ -17,9 +17,8 @@ public class Main {
     private static Scanner serverScanner;
 
     public static void main(String[] args) {
-        // Initialisation de la connexion au serveur
-        String serverHost = "127.0.0.1"; // Adresse IP du serveur
-        int serverPort = 12345; // Port du serveur
+        String serverHost = "127.0.0.1";
+        int serverPort = 12345;
 
         try {
             socket = new Socket(serverHost, serverPort);
@@ -27,8 +26,7 @@ public class Main {
             serverScanner = new Scanner(socket.getInputStream());
             System.out.println("Connected to the server");
 
-            // Envoi d'un message au serveur
-            writer.println("Hello Server! Main Client Connected.");
+            writer.println("Main Client Connected.");
 
             // Initialisation du bus d'événements
             EventBus eventBus = new EventBus();
@@ -46,15 +44,14 @@ public class Main {
                 System.out.println("1. Team Management");
                 System.out.println("2. Match Management");
                 System.out.println("3. Notification Management");
-                System.out.println("4. Send Message to Server");
-                System.out.println("5. Exit");
+                System.out.println("4. Exit");
                 System.out.print("Choice: ");
 
                 int choice = Integer.parseInt(scanner.nextLine());
                 switch (choice) {
                     case 1 -> {
                         System.out.println("Launching Team Management...");
-                        teamController.start(); // Lance le menu du TeamController
+                        teamController.start();
                     }
                     case 2 -> {
                         System.out.println("Launching Match Management...");
@@ -65,19 +62,9 @@ public class Main {
                         notificationController.start();
                     }
                     case 4 -> {
-                        System.out.print("Enter message to send to server: ");
-                        String message = scanner.nextLine();
-                        writer.println(message); // Envoi du message au serveur
-
-                        // Lecture de la réponse du serveur
-                        if (serverScanner.hasNextLine()) {
-                            System.out.println("Server: " + serverScanner.nextLine());
-                        }
-                    }
-                    case 5 -> {
                         System.out.println("Exiting the application. Goodbye!");
                         closeConnection();
-                        return; // Quitte l'application
+                        return;
                     }
                     default -> System.out.println("Invalid choice. Please try again.");
                 }

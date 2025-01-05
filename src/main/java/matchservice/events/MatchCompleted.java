@@ -16,6 +16,6 @@ public class MatchCompleted implements Event {
 
     @Override
     public String getType() {
-        return "MatchCompleted";  // Type d'événement unique pour MatchCompleted
+        return "MatchCompleted";
     }
 }

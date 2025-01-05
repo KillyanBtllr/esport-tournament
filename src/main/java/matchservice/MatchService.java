@@ -54,7 +54,7 @@ public class MatchService {
             System.out.println("Match with ID " + matchId + " is already completed and cannot be cancelled.");
             return;
         }
-        matches.remove(matchId);
+        match.cancelMatch(matchId);
         eventBus.publish(new MatchCancelled(match));
         System.out.println("Match cancelled: " + match);
     }
