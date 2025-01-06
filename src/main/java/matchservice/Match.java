@@ -1,6 +1,9 @@
 package matchservice;
 
+import db.DataBaseManager;
+
 import java.util.Objects;
+import java.sql.SQLException;
 
 public class Match {
     private int matchId;
@@ -41,14 +44,39 @@ public class Match {
         return isCancelled;
     }
 
-    // Méthode pour marquer le match comme terminé et mettre à jour les scores
     public void completeMatch(int scoreTeam1, int scoreTeam2) {
+
         if (!isCancelled) {
             this.scoreTeam1 = scoreTeam1;
             this.scoreTeam2 = scoreTeam2;
             this.isCompleted = true;
+            System.out.println("Match comdfdsfdsfsddsfpleted: ");
+            updateDatabase();
+
+            System.out.println("Match completed: " + team1 + " vs " + team2);
         } else {
             System.out.println("Cannot complete a cancelled match.");
+        }
+    }
+
+
+    private void updateDatabase() {
+        try {
+            int team1Id = DataBaseManager.getTeamIdByName(team1);
+            int team2Id = DataBaseManager.getTeamIdByName(team2);
+
+            DataBaseManager.updateTeamPoints(team1Id, scoreTeam1);
+            DataBaseManager.updateTeamPoints(team2Id, scoreTeam2);
+
+            if (scoreTeam1 > scoreTeam2) {
+                DataBaseManager.updateTeamWins(team1Id);
+            } else if (scoreTeam2 > scoreTeam1) {
+                DataBaseManager.updateTeamWins(team2Id);
+            } else {
+                System.out.println("It's a draw!");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 

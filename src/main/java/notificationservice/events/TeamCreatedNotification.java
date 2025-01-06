@@ -17,10 +17,4 @@ public class TeamCreatedNotification implements Event {
     public String getType() {
         return "TeamCreatedNotification";
     }
-
-    public String toString() {
-        return "TeamCreatedNotification{" +
-                "message='" + message + '\'' +
-                '}';
-    }
 }

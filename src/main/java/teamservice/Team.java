@@ -5,10 +5,14 @@ import java.util.Objects;
 public class Team {
     private final String id;
     private String name;
+    private int points;
+    private int win;
 
     public Team(String id, String name) {
         this.id = id;
         this.name = name;
+        this.points = 0;
+        this.win = 0;
     }
 
     public String getId() {

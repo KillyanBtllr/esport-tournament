@@ -1,6 +1,8 @@
 package client;
 
+import db.DataBaseManager;
 import eventbus.EventBus;
+import matchservice.Match;
 import notificationservice.NotificationService;
 import teamservice.TeamController;
 import matchservice.MatchController;
@@ -19,6 +21,7 @@ public class Main {
     public static void main(String[] args) {
         String serverHost = "127.0.0.1";
         int serverPort = 12345;
+        DataBaseManager.createDatabase();
 
         try {
             socket = new Socket(serverHost, serverPort);
