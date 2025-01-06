@@ -34,7 +34,8 @@ public class Main {
             // Instanciation des différents contrôleurs
             TeamController teamController = new TeamController(eventBus);
             MatchController matchController = new MatchController(eventBus);
-            NotificationController notificationController = new NotificationController(new NotificationService(eventBus));
+            NotificationController notificationController =
+                    new NotificationController(new NotificationService(eventBus), eventBus);
 
             // Scanner pour les interactions utilisateur
             Scanner scanner = new Scanner(System.in);

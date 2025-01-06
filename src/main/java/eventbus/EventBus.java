@@ -1,34 +1,38 @@
 package eventbus;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 public class EventBus {
-    private final Map<String, Set<EventListener<? extends Event>>> listeners = new ConcurrentHashMap<>();
+    private final Map<String, List<Consumer<Event>>> subscribers;
 
-    public <T extends Event> void publish(T event) {
-        Set<EventListener<? extends Event>> eventListeners = listeners.get(event.getType());
-        if (eventListeners != null) {
-            for (EventListener<? extends Event> listener : eventListeners) {
-                @SuppressWarnings("unchecked")
-                EventListener<T> typedListener = (EventListener<T>) listener;
-                typedListener.handle(event);
-            }
+    public EventBus() {
+        // Utilisation d'une ConcurrentHashMap pour la gestion thread-safe
+        this.subscribers = new ConcurrentHashMap<>();
+    }
+
+    public void subscribe(String eventType, Consumer<Event> listener) {
+        subscribers.computeIfAbsent(eventType, k -> new ArrayList<>()).add(listener);
+    }
+
+    public void publish(Event event) {
+        List<Consumer<Event>> listeners = subscribers.get(event.getType());
+        if (listeners != null) {
+            // Notifier tous les abonnés
+            listeners.forEach(listener -> listener.accept(event));
         }
     }
 
-    public <T extends Event> void subscribe(String eventType, EventListener<T> listener) {
-        listeners.computeIfAbsent(eventType, key -> new HashSet<>()).add(listener);
-    }
-
-    public <T extends Event> void unsubscribe(String eventType, EventListener<T> listener) {
-        Set<EventListener<? extends Event>> eventListeners = listeners.get(eventType);
-        if (eventListeners != null) {
-            eventListeners.remove(listener);
-            if (eventListeners.isEmpty()) {
-                listeners.remove(eventType);
+    public void unsubscribe(String eventType, Consumer<Event> listener) {
+        List<Consumer<Event>> listeners = subscribers.get(eventType);
+        if (listeners != null) {
+            listeners.remove(listener);
+            // Supprimer l'entrée si la liste est vide
+            if (listeners.isEmpty()) {
+                subscribers.remove(eventType);
             }
         }
     }

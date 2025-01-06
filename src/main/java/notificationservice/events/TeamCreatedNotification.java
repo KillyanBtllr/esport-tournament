@@ -18,7 +18,6 @@ public class TeamCreatedNotification implements Event {
         return "TeamCreatedNotification";
     }
 
-    @Override
     public String toString() {
         return "TeamCreatedNotification{" +
                 "message='" + message + '\'' +
