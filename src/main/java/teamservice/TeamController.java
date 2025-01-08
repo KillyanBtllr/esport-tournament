@@ -1,7 +1,10 @@
 package teamservice;
 
+import db.DataBaseManager;
 import eventbus.EventBus;
 
+import java.sql.SQLException;
+import java.util.List;
 import java.util.Scanner;
 
 public class TeamController {
@@ -38,25 +41,29 @@ public class TeamController {
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Please enter a valid number.");
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
         }
     }
 
-    private void addTeam() {
-        System.out.print("Enter Team ID: ");
-        String id = scanner.nextLine().trim();
-        System.out.print("Enter Team Name: ");
-        String name = scanner.nextLine().trim();
+    private void addTeam() throws SQLException {
+        String name;
+        do {
+            System.out.print("Enter Team Name: ");
+            name = scanner.nextLine().trim();
 
-        if (id.isEmpty() || name.isEmpty()) {
-            System.out.println("Team ID and Name cannot be empty.");
-            return;
-        }
+            if (DataBaseManager.isTeamNameExists(name)) {
+                System.out.println("A team with this name already exists. Please enter a different name.");
+            } else {
+                break;
+            }
+        } while (true);
 
-        if (teamService.addTeam(id, name)) {
+        if (teamService.addTeam(name)) {
             System.out.println("Team added successfully.");
         } else {
-            System.out.println("A team with the same ID already exists.");
+            System.out.println("Failed to add the team.");
         }
     }
 
@@ -82,16 +89,27 @@ public class TeamController {
         System.out.print("Enter Team ID: ");
         String id = scanner.nextLine().trim();
 
-        if (teamService.removeTeam(id)) {
-            System.out.println("Team removed successfully.");
-        } else {
-            System.out.println("Team not found.");
+        try {
+            if (DataBaseManager.removeTeamFromDatabase(id)) {
+                System.out.println("Team removed successfully.");
+            } else {
+                System.out.println("Team not found.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Failed to remove the team from the database.");
         }
     }
 
     private void listAllTeams() {
         System.out.println("\n=== All Teams ===");
-        teamService.getAllTeams().forEach((id, team) ->
-                System.out.println("ID: " + id + " | Name: " + team.getName()));
+        try {
+            List<Team> teams = DataBaseManager.getAllTeamsFromDatabase();
+            teams.forEach(team ->
+                    System.out.println("ID: " + team.getId() + " | Name: " + team.getName()));
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Failed to retrieve teams from the database.");
+        }
     }
 }

@@ -50,7 +50,6 @@ public class Match {
             this.scoreTeam1 = scoreTeam1;
             this.scoreTeam2 = scoreTeam2;
             this.isCompleted = true;
-            System.out.println("Match comdfdsfdsfsddsfpleted: ");
             updateDatabase();
 
             System.out.println("Match completed: " + team1 + " vs " + team2);
@@ -62,16 +61,16 @@ public class Match {
 
     private void updateDatabase() {
         try {
-            int team1Id = DataBaseManager.getTeamIdByName(team1);
-            int team2Id = DataBaseManager.getTeamIdByName(team2);
+            String team1Id = String.valueOf(DataBaseManager.getTeamIdByName(team1));
+            String team2Id = String.valueOf(DataBaseManager.getTeamIdByName(team2));
 
-            DataBaseManager.updateTeamPoints(team1Id, scoreTeam1);
-            DataBaseManager.updateTeamPoints(team2Id, scoreTeam2);
+            DataBaseManager.updateTeamPoints(Integer.parseInt(team1Id), scoreTeam1);
+            DataBaseManager.updateTeamPoints(Integer.parseInt(team2Id), scoreTeam2);
 
             if (scoreTeam1 > scoreTeam2) {
-                DataBaseManager.updateTeamWins(team1Id);
+                DataBaseManager.updateTeamWins(Integer.parseInt(team1Id));
             } else if (scoreTeam2 > scoreTeam1) {
-                DataBaseManager.updateTeamWins(team2Id);
+                DataBaseManager.updateTeamWins(Integer.parseInt(team2Id));
             } else {
                 System.out.println("It's a draw!");
             }

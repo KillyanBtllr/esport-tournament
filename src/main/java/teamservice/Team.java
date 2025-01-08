@@ -15,6 +15,13 @@ public class Team {
         this.win = 0;
     }
 
+    public Team(String id, String name, int points, int win) {
+        this.id = id;
+        this.name = name;
+        this.points = points;
+        this.win = win;
+    }
+
     public String getId() {
         return id;
     }
@@ -46,5 +53,13 @@ public class Team {
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 '}';
+    }
+
+    public int getWins() {
+        return win;
+    }
+
+    public int getPoints() {
+        return points;
     }
 }
