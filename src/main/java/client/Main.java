@@ -15,7 +15,7 @@ import java.util.Scanner;
 
 public class Main {
     private static Socket socket;
-    private static PrintWriter writer;
+    public static PrintWriter writer;
     private static Scanner serverScanner;
 
     public static void main(String[] args) {

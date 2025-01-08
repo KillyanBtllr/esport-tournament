@@ -1,6 +1,7 @@
 package notificationservice;
 
 import eventbus.EventBus;
+import client.Main;
 import notificationservice.events.MatchResultNotification;
 import notificationservice.events.TeamCreatedNotification;
 import teamservice.events.TeamCreated;
@@ -13,7 +14,8 @@ public class NotificationService {
 
         eventBus.subscribe("TeamCreated", event -> {
             TeamCreated teamCreated = (TeamCreated) event;
-            System.out.println("New team created: ID = " + teamCreated.getId() + ", Name = " + teamCreated.getName());
+            //System.out.println("New team created: ID = " + teamCreated.getId() + ", Name = " + teamCreated.getName());
+            Main.writer.println("New team created: ID = " + teamCreated.getId() + ", Name = " + teamCreated.getName());
         });
 
     }
